@@ -1,2 +1,6 @@
 # Ignore wordlist before pushing
 wordlist.txt
+
+# Ignore pycache
+__pycache__/*
+*.pyc
