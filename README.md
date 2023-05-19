@@ -1,4 +1,4 @@
-# Wyrld
+# Wyrdl
 
 A Python-based Wordle Clone for the Terminal.
 
