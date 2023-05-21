@@ -56,20 +56,30 @@ def get_random_word(word_list: List[str]) -> str:
     return random.choice(words)
 
 def show_guesses(guesses: List[str], word: str) -> None:
+    """Show the previous guesses and their status.
+
+    Args:
+        guesses (List[str]): List of previous guesses.
+        word (str): The correct word.
+
+    Returns:
+        None
+    """
     for guess in guesses:
         styled_guess = []
-        for letter, correct in zip(guess, word):
+        for letter, correct in zip(guess, word): # Check letter by letter
             if letter == correct:
-                style = 'bold white on green'
+                style = 'bold white on green' # If correct
             elif letter in word:
-                style = 'bold white on yellow'
+                style = 'bold white on yellow' # If misplaced
             elif letter in ascii_letters:
-                style = 'white on #666666'
+                style = 'white on #666666' # If wrong
             else:
-                style = 'dim'
+                style = 'dim' # Normal style
             styled_guess.append(f'[{style}]{letter}[/]')
 
-        console.print(''.join(styled_guess), justify='center')
+        # Print styled guesses
+        console.print(''.join(styled_guess), justify='center') 
 
 def game_over(word: str) -> None:
     """Show the correct word after the game ends.
@@ -88,9 +98,17 @@ def game_over(word: str) -> None:
     # Reveal the correct word
     print(f'The word was {word}')
 
-def refresh_page(headline):
-    console.clear()
-    console.rule(f'[bold blue]:leafy_green: {headline} :leafy_green:[/]\n')
+def refresh_page(headline: str) -> None:
+    """Clear the console and re-print the headline.
+    
+    Args:
+        headline (str): Header title.
+        
+    Returns:
+        None
+    """
+    console.clear() # Clear the console
+    console.rule(f'[bold blue]:leafy_green: {headline} :leafy_green:[/]\n') # Print header
 
 if __name__ == '__main__':
     main()
