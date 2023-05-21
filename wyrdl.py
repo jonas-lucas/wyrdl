@@ -1,8 +1,14 @@
 # Import essentials libraries
 import pathlib
 import random
+
 from string import ascii_letters
 from typing import List
+
+from rich.console import Console
+from rich.theme import Theme
+
+console = Console(width=40, theme=Theme({'warning': 'red on yellow'}))
 
 def main():
     """Main function to run the word guessing game."""
@@ -10,13 +16,16 @@ def main():
     # Pre-process: Load the word list and choose a random word
     words_path = pathlib.Path(__file__).parent / 'wordlist.txt'
     word = get_random_word(words_path.read_text(encoding='utf-8').split('\n'))
+    guesses = ['_' * 5] * 6
 
     # Process (main loop): Allow the user to make guesses and provide feedback
-    for guess_num in range(1, 7):
-        guess = input(f'\nGuess {guess_num}: ').upper() # Prompt the user for a guess
+    for idx in range(6):
+        refresh_page(headline=f'Guess {idx + 1}')
+        show_guesses(guesses, word)
+
+        guesses[idx] = input(f'\nGuess word: ').upper() # Prompt the user for a guess
         
-        show_guess(guess, word)
-        if guess == word: # If the guess is correct, end the game
+        if guesses[idx] == word: # If the guess is correct, end the game
             break
     
     # Post-process: Finish the game
@@ -46,32 +55,21 @@ def get_random_word(word_list: List[str]) -> str:
     # Return a random word from the loaded word list
     return random.choice(words)
 
-def show_guess(guess: str, word: str) -> None:
-    """Show the user's guess on the terminal and classify all letters.
-    
-    Args:
-        guess (str): User's guess.
-        word (str): The correct word.
+def show_guesses(guesses: List[str], word: str) -> None:
+    for guess in guesses:
+        styled_guess = []
+        for letter, correct in zip(guess, word):
+            if letter == correct:
+                style = 'bold white on green'
+            elif letter in word:
+                style = 'bold white on yellow'
+            elif letter in ascii_letters:
+                style = 'white on #666666'
+            else:
+                style = 'dim'
+            styled_guess.append(f'[{style}]{letter}[/]')
 
-    Returns:
-        None
-
-    Example:
-        >>> show_guess('CRANE', 'SNAKE')
-        Correct letters: A, E
-        Misplaced letters: N
-        Wrong letters: C, R
-    """
-
-    # Classify the letters in the guess as correct, misplaced and wrong
-    correct_letters     = set(letter for letter, correct in zip(guess, word) if letter == correct)
-    misplaced_letters   = set(guess) & set(word) - correct_letters
-    wrong_letters       = set(guess) - set(word)
-
-    # Display the classification of letters
-    print('Correct letters:',   ', '.join(sorted(correct_letters)))
-    print('Misplaced letters:', ', '.join(sorted(misplaced_letters)))
-    print('Wrong letters:',     ', '.join(sorted(wrong_letters)))
+        console.print(''.join(styled_guess), justify='center')
 
 def game_over(word: str) -> None:
     """Show the correct word after the game ends.
@@ -89,6 +87,10 @@ def game_over(word: str) -> None:
 
     # Reveal the correct word
     print(f'The word was {word}')
+
+def refresh_page(headline):
+    console.clear()
+    console.rule(f'[bold blue]:leafy_green: {headline} :leafy_green:[/]\n')
 
 if __name__ == '__main__':
     main()

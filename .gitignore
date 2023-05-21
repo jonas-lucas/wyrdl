@@ -4,3 +4,11 @@ wordlist.txt
 # Ignore pycache
 __pycache__/*
 *.pyc
+
+# Ignore venv
+venv/*
+bin/*
+include/*
+lib/*
+lib64/*
+*.cfg
