@@ -23,48 +23,27 @@ def main():
         refresh_page(headline=f'Guess {idx + 1}')
         show_guesses(guesses, word)
 
-        guesses[idx] = input(f'\nGuess word: ').upper() # Prompt the user for a guess
+        guesses[idx] = input('\nGuess word: ').upper() # Prompt the user for a guess
         
         if guesses[idx] == word: # If the guess is correct, end the game
             break
     
     # Post-process: Finish the game
-    else:
-        game_over(word)
+    game_over(guesses, word, guessed_correctly=guesses[idx] == word)
+
+def refresh_page(headline: str) -> None:
+    console.clear() # Clear the console
+    console.rule(f'[bold blue]:leafy_green: {headline} :leafy_green:[/]\n') # Print header
 
 def get_random_word(word_list: List[str]) -> str:
-    """Get a random five-letter word from a list of strings.
-    
-    Args:
-        word_list (List[str]): List of words.
-
-    Returns:
-        str: Random five-letter word from the list.
-
-    Example:
-        >>> get_random_word(["snake", "worm", "it\'ll"])
-        'SNAKE'
-    """
-
-    # Load valid words from the wordlist file
+    # Load valid words from the wordlist file 
     words = [
         word.upper() for word in word_list
         if len(word) == 5 and all(letter in ascii_letters for letter in word)
     ]
-
-    # Return a random word from the loaded word list
-    return random.choice(words)
+    return random.choice(words) # Return a random word from the loaded word list
 
 def show_guesses(guesses: List[str], word: str) -> None:
-    """Show the previous guesses and their status.
-
-    Args:
-        guesses (List[str]): List of previous guesses.
-        word (str): The correct word.
-
-    Returns:
-        None
-    """
     for guess in guesses:
         styled_guess = []
         for letter, correct in zip(guess, word): # Check letter by letter
@@ -81,34 +60,14 @@ def show_guesses(guesses: List[str], word: str) -> None:
         # Print styled guesses
         console.print(''.join(styled_guess), justify='center') 
 
-def game_over(word: str) -> None:
-    """Show the correct word after the game ends.
-    
-    Args:
-        word (str): The correct word.
+def game_over(guesses: List[str], word: str, guessed_correctly: bool) -> None:
+    refresh_page(headline='Game Over')
+    show_guesses(guesses, word)
 
-    Returns:
-        None
-    
-    Example:
-        >>> game_over('SNAKE')
-        The word was SNAKE
-    """
-
-    # Reveal the correct word
-    print(f'The word was {word}')
-
-def refresh_page(headline: str) -> None:
-    """Clear the console and re-print the headline.
-    
-    Args:
-        headline (str): Header title.
-        
-    Returns:
-        None
-    """
-    console.clear() # Clear the console
-    console.rule(f'[bold blue]:leafy_green: {headline} :leafy_green:[/]\n') # Print header
+    if guessed_correctly:
+        console.print(f'\n[bold white on green]Correct, the word is {word}[/]')
+    else:
+        console.print(f'\n[bold white on red]Sorry, the word was {word}[/]')
 
 if __name__ == '__main__':
     main()
