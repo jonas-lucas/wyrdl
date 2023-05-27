@@ -23,7 +23,7 @@ def main():
         refresh_page(headline=f'Guess {idx + 1}')
         show_guesses(guesses, word)
 
-        guesses[idx] = input('\nGuess word: ').upper() # Prompt the user for a guess
+        guesses[idx] = guess_word(previous_guesses=guesses[:idx]) # Prompt the user for a guess
         
         if guesses[idx] == word: # If the guess is correct, end the game
             break
@@ -37,11 +37,14 @@ def refresh_page(headline: str) -> None:
 
 def get_random_word(word_list: List[str]) -> str:
     # Load valid words from the wordlist file 
-    words = [
+    if words := [
         word.upper() for word in word_list
         if len(word) == 5 and all(letter in ascii_letters for letter in word)
-    ]
-    return random.choice(words) # Return a random word from the loaded word list
+    ]:
+        return random.choice(words) # Return a random word from the loaded word list
+    else:
+        console.print('No words of length 5 in the word list', style='warning')
+        raise SystemExit()
 
 def show_guesses(guesses: List[str], word: str) -> None:
     for guess in guesses:
@@ -59,6 +62,26 @@ def show_guesses(guesses: List[str], word: str) -> None:
 
         # Print styled guesses
         console.print(''.join(styled_guess), justify='center') 
+
+def guess_word(previous_guesses):
+    guess = console.input('\nGuess word: ').upper()
+
+    if guess in previous_guesses:
+        console.print(f'You\'ve already guessed {guess}.', style='warning')
+        return guess_word(previous_guesses)
+
+    if len(guess) != 5:
+        console.print('Your guess must be 5 letters.', style='warning')
+        return guess_word(previous_guesses)
+
+    if any((invalid := letter) not in ascii_letters for letter in guess):
+        console.print(
+            f'Invalid letter: \'{invalid}\'. Please use English letters.',
+            style='warning',
+        )
+        return guess_word(previous_guesses)
+
+    return guess
 
 def game_over(guesses: List[str], word: str, guessed_correctly: bool) -> None:
     refresh_page(headline='Game Over')
