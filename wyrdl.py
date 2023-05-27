@@ -8,7 +8,7 @@ from typing import List
 from rich.console import Console
 from rich.theme import Theme
 
-console = Console(width=40, theme=Theme({'warning': 'red on yellow'}))
+console = Console(width=40, theme=Theme({'warning': 'red on yellow'})) # Instance the console
 
 def main():
     """Main function to run the word guessing game."""
@@ -20,8 +20,8 @@ def main():
 
     # Process (main loop): Allow the user to make guesses and provide feedback
     for idx in range(6):
-        refresh_page(headline=f'Guess {idx + 1}')
-        show_guesses(guesses, word)
+        refresh_page(headline=f'Guess {idx + 1}') # Refresh the page with a new headline
+        show_guesses(guesses, word) # Display the current state of guesses
 
         guesses[idx] = guess_word(previous_guesses=guesses[:idx]) # Prompt the user for a guess
         
@@ -32,21 +32,27 @@ def main():
     game_over(guesses, word, guessed_correctly=guesses[idx] == word)
 
 def refresh_page(headline: str) -> None:
+    """Clears the console and prints the provided headline as the new header."""
     console.clear() # Clear the console
     console.rule(f'[bold blue]:leafy_green: {headline} :leafy_green:[/]\n') # Print header
 
 def get_random_word(word_list: List[str]) -> str:
+    """Returns a random word from the given list of the words, filtered by length and character
+    requirements."""
     # Load valid words from the wordlist file 
     if words := [
         word.upper() for word in word_list
         if len(word) == 5 and all(letter in ascii_letters for letter in word)
     ]:
-        return random.choice(words) # Return a random word from the loaded word list
+        # Return a random word from the loaded word list
+        return random.choice(words) 
     else:
+        # Return an error and end the game
         console.print('No words of length 5 in the word list', style='warning')
         raise SystemExit()
 
 def show_guesses(guesses: List[str], word: str) -> None:
+    """Prints the current state of guesses, highlighting correct, misplaced, and wrong letters."""
     for guess in guesses:
         styled_guess = []
         for letter, correct in zip(guess, word): # Check letter by letter
@@ -58,22 +64,26 @@ def show_guesses(guesses: List[str], word: str) -> None:
                 style = 'white on #666666' # If wrong
             else:
                 style = 'dim' # Normal style
-            styled_guess.append(f'[{style}]{letter}[/]')
+            styled_guess.append(f'[{style}]{letter}[/]') # Save styled previous guesses
 
-        # Print styled guesses
+        # Print styled previous guesses
         console.print(''.join(styled_guess), justify='center') 
 
 def guess_word(previous_guesses):
-    guess = console.input('\nGuess word: ').upper()
+    """Prompts the user to enter a guess and performs input validation."""
+    guess = console.input('\nGuess word: ').upper() # Prompt the user for a guess
 
+    # Check if the guess is repeatable
     if guess in previous_guesses:
         console.print(f'You\'ve already guessed {guess}.', style='warning')
         return guess_word(previous_guesses)
 
+    # Check if the guess length is not 5 
     if len(guess) != 5:
         console.print('Your guess must be 5 letters.', style='warning')
         return guess_word(previous_guesses)
 
+    # Check if the guess is a letter
     if any((invalid := letter) not in ascii_letters for letter in guess):
         console.print(
             f'Invalid letter: \'{invalid}\'. Please use English letters.',
@@ -81,15 +91,17 @@ def guess_word(previous_guesses):
         )
         return guess_word(previous_guesses)
 
-    return guess
+    return guess # Return correct input
 
 def game_over(guesses: List[str], word: str, guessed_correctly: bool) -> None:
+    """Prints the game over screen, displaying the guesses and whether the word was guessed 
+    correctly."""
     refresh_page(headline='Game Over')
     show_guesses(guesses, word)
 
-    if guessed_correctly:
+    if guessed_correctly: # If the word was guessed correctly
         console.print(f'\n[bold white on green]Correct, the word is {word}[/]')
-    else:
+    else: # If the word was not guessed correctly
         console.print(f'\n[bold white on red]Sorry, the word was {word}[/]')
 
 if __name__ == '__main__':
